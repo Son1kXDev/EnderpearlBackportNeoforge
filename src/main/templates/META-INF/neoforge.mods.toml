@@ -1,0 +1,44 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "${loader_version_range}" #mandatory
+license = "${mod_license}"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+# A URL to query for updates for this mod. See the JSON update specification https://docs.neoforge.net/docs/misc/updatechecker/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+#logoFile="enderpearlbackport.png" #optional
+#credits="" #optional
+authors = "${mod_authors}" #optional
+description = '''${mod_description}'''
+
+# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
+#[[mixins]]
+#config="${mod_id}.mixins.json"
+
+# The [[accessTransformers]] block allows you to declare where your AT file is.
+# If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
+#[[accessTransformers]]
+#file="META-INF/accesstransformer.cfg"
+
+[[dependencies."${mod_id}"]] #optional
+# the modid of the dependency
+modId = "neoforge" #mandatory
+# The type of the dependency. Can be one of "required", "optional", "incompatible" or "discouraged" (case insensitive).
+# 'required' requires the mod to exist, 'optional' does not
+# 'incompatible' will prevent the game from loading when the mod exists, and 'discouraged' will show a warning
+type = "required" #mandatory
+versionRange = "${neo_version_range}" #mandatory
+ordering = "NONE"
+side = "BOTH"
+[[dependencies."${mod_id}"]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+#[features."${mod_id}"]
+#openGLVersion="[3.2,)"
