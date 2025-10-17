@@ -13,15 +13,15 @@ assignees: Son1kXDev
 ## Mod Version
 (e.g. 2.0.1)
 
-## Fabric & Java Version
-(e.g. Fabric 0.16.9, Java 17)
+## Neoforge & Java Version
+(e.g. Neoforge 21.1.209, Java 17)
 
 ## What happened?
 Describe the bug. What did you expect to happen? What happened instead?
 
 ## Steps to Reproduce
-1. Send a message 
-2. Crash 
+1. Throw an enderpearl in nether portal
+2. Server crash 
 
 ## Logs / Crash Reports
 Please attach `latest.log` or `crash-report.txt`.  
