@@ -21,9 +21,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Mod(EnderpearlBackport.MODID)
 public class EnderpearlBackport {
@@ -34,7 +32,6 @@ public class EnderpearlBackport {
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(this);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-        EnderpearlSaveManager.loadFromFile();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -73,7 +70,7 @@ public class EnderpearlBackport {
                 }
             }
         }
-        
+
         EnderpearlChunkManager.cleanupOrphanPearls(server, alivePearls);
     }
 
@@ -84,40 +81,52 @@ public class EnderpearlBackport {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
+        List<EnderpearlData> pearls = new ArrayList<>();
+
         for (ServerLevel level : server.getAllLevels()) {
             for (Entity e : level.getEntities().getAll()) {
                 if (e instanceof ThrownEnderpearl pearl && pearl.getOwner() == player) {
+
+                    UUID pearlId = pearl.getUUID();
                     Vec3 pos = pearl.position();
                     Vec3 vel = pearl.getDeltaMovement();
-                    EnderpearlData data = new EnderpearlData(player.getUUID(), level.dimension(), pos, vel);
-                    EnderpearlSaveManager.savePearl(data);
+
+                    pearls.add(new EnderpearlData(
+                            pearlId,
+                            player.getUUID(),
+                            level.dimension(),
+                            pos,
+                            vel
+                    ));
+
                     pearl.discard();
                 }
             }
         }
+
+        EnderpearlSaveManager.saveAll(player.getUUID(), pearls);
     }
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
-        EnderpearlData data = EnderpearlSaveManager.getPearl(player.getUUID());
-        if (data == null) return;
-
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        ServerLevel level = server.getLevel(data.dimension);
-        if (level == null) return;
+        List<EnderpearlData> pearls = EnderpearlSaveManager.loadAll(player.getUUID());
+        if (pearls.isEmpty()) return;
 
-        ThrownEnderpearl pearl = new ThrownEnderpearl(level, player);
-        pearl.setPos(data.position);
-        pearl.setDeltaMovement(data.velocity);
-        level.addFreshEntity(pearl);
+        for (EnderpearlData data : pearls) {
+            ServerLevel level = server.getLevel(data.dimension);
+            if (level == null) continue;
 
-        EnderpearlSaveManager.removePearl(player.getUUID());
+            ThrownEnderpearl pearl = new ThrownEnderpearl(level, player);
+            pearl.moveTo(data.position);
+            pearl.setDeltaMovement(data.velocity);
+            pearl.setUUID(data.pearlId);
 
-        LOGGER.info("[EnderPearlBackport] Restored ender pearl for player " + player.getName().getString());
+            level.addFreshEntity(pearl);
+        }
     }
 
 

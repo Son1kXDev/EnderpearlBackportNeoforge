@@ -2,6 +2,7 @@ package com.enjine.enderpearlbackport;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -14,72 +15,62 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class EnderpearlSaveManager {
-    private static final Path SAVE_PATH = Paths.get("config", "enderpearlbackport_data.json");
+
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Map<UUID, EnderpearlData> DATA = new HashMap<>();
+    private static final Path SAVE_PATH = Path.of("config/enderpearl_backport.json");
 
-    public static void savePearl(EnderpearlData data) {
-        DATA.put(data.playerId, data);
-        saveToFile();
-    }
 
-    public static EnderpearlData getPearl(UUID playerId) {
-        return DATA.get(playerId);
-    }
-
-    public static void removePearl(UUID playerId) {
-        DATA.remove(playerId);
-        saveToFile();
-    }
-
-    public static void loadFromFile() {
-        if (!Files.exists(SAVE_PATH)) return;
+    public static List<EnderpearlData> loadAll(UUID playerId) {
+        if (!Files.exists(SAVE_PATH)) return List.of();
 
         try (Reader reader = Files.newBufferedReader(SAVE_PATH)) {
             JsonObject root = GSON.fromJson(reader, JsonObject.class);
-            DATA.clear();
+            if (!root.has(playerId.toString())) return List.of();
 
-            for (String key : root.keySet()) {
-                UUID uuid = UUID.fromString(key);
-                JsonObject obj = root.getAsJsonObject(key);
-                String dim = obj.get("dimension").getAsString();
+            JsonObject pearlsObj = root.getAsJsonObject(playerId.toString());
+            List<EnderpearlData> result = new ArrayList<>();
 
-                Vec3 pos = new Vec3(
-                        obj.get("x").getAsDouble(),
-                        obj.get("y").getAsDouble(),
-                        obj.get("z").getAsDouble()
-                );
+            for (Map.Entry<String, JsonElement> entry : pearlsObj.entrySet()) {
+                JsonObject obj = entry.getValue().getAsJsonObject();
 
-                Vec3 vel = new Vec3(
-                        obj.get("vx").getAsDouble(),
-                        obj.get("vy").getAsDouble(),
-                        obj.get("vz").getAsDouble()
-                );
+                UUID pearlUUID = UUID.fromString(entry.getKey());
 
-                ResourceLocation dimLoc = ResourceLocation.parse(dim);
-                ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, dimLoc);
+                ResourceLocation id = ResourceLocation.tryParse(obj.get("dimension").getAsString());
+                ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, id);
 
-                EnderpearlData data = new EnderpearlData(uuid, dimension, pos, vel);
-                DATA.put(uuid, data);
+                Vec3 pos = new Vec3(obj.get("x").getAsDouble(), obj.get("y").getAsDouble(), obj.get("z").getAsDouble());
+                Vec3 vel = new Vec3(obj.get("vx").getAsDouble(), obj.get("vy").getAsDouble(), obj.get("vz").getAsDouble());
+
+                result.add(new EnderpearlData(pearlUUID, playerId, dimension, pos, vel));
             }
 
+            return result;
         } catch (IOException e) {
             e.fillInStackTrace();
         }
+
+        return List.of();
     }
 
-    private static void saveToFile() {
-        JsonObject root = new JsonObject();
-        for (var entry : DATA.entrySet()) {
-            UUID uuid = entry.getKey();
-            EnderpearlData data = entry.getValue();
 
+    public static void saveAll(UUID playerId, List<EnderpearlData> pearls) {
+        JsonObject root = new JsonObject();
+
+        if (Files.exists(SAVE_PATH)) {
+            try (Reader reader = Files.newBufferedReader(SAVE_PATH)) {
+                root = GSON.fromJson(reader, JsonObject.class);
+            } catch (Exception ignored) {
+            }
+        }
+
+        JsonObject pearlsObj = new JsonObject();
+        for (EnderpearlData data : pearls) {
             JsonObject obj = new JsonObject();
             obj.addProperty("dimension", data.dimension.location().toString());
             obj.addProperty("x", data.position.x);
@@ -88,8 +79,11 @@ public class EnderpearlSaveManager {
             obj.addProperty("vx", data.velocity.x);
             obj.addProperty("vy", data.velocity.y);
             obj.addProperty("vz", data.velocity.z);
-            root.add(uuid.toString(), obj);
+
+            pearlsObj.add(data.pearlId.toString(), obj);
         }
+
+        root.add(playerId.toString(), pearlsObj);
 
         try (Writer writer = Files.newBufferedWriter(SAVE_PATH)) {
             GSON.toJson(root, writer);
