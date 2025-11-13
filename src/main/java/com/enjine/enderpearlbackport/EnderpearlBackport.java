@@ -21,6 +21,10 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 @Mod(EnderpearlBackport.MODID)
 public class EnderpearlBackport {
     public static final String MODID = "enderpearlbackport";
@@ -42,12 +46,15 @@ public class EnderpearlBackport {
         MinecraftServer server = event.getServer();
         if (server == null) return;
 
+        Set<UUID> alivePearls = new HashSet<>();
+
         for (ServerLevel level : server.getAllLevels()) {
             for (Entity entity : level.getEntities().getAll()) {
                 if (!(entity instanceof ThrownEnderpearl pearl)) continue;
 
+                alivePearls.add(pearl.getUUID());
+                EnderpearlChunkManager.updatePearlChunk(server, level, pearl);
                 BlockPos pos = pearl.blockPosition();
-                EnderpearlChunkManager.loadChunk(level, pos.getX() >> 4, pos.getZ() >> 4);
 
                 if (level.getBlockState(pos).is(Blocks.NETHER_PORTAL) || level.getBlockState(pos).is(Blocks.END_PORTAL)) {
                     if (pearl.getOwner() instanceof ServerPlayer player) {
@@ -66,7 +73,10 @@ public class EnderpearlBackport {
                 }
             }
         }
+        
+        EnderpearlChunkManager.cleanupOrphanPearls(server, alivePearls);
     }
+
 
     @SubscribeEvent
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {

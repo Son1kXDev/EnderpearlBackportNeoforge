@@ -70,7 +70,7 @@ public class EnderpearlSaveManager {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 
@@ -94,7 +94,7 @@ public class EnderpearlSaveManager {
         try (Writer writer = Files.newBufferedWriter(SAVE_PATH)) {
             GSON.toJson(root, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
 }
