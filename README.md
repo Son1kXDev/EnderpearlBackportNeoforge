@@ -88,7 +88,7 @@ This mod **backports the exact modern behavior**, without hacks or approximation
 
 ---
 
-## 🛠️ For Mod Developers
+## For Mod Developers
 
 The project is structured to make future ports easy:
 
@@ -108,4 +108,4 @@ To add support for a new version:
 ---
 
 ## License
-MIT
+[Creative Commons Attribution 4.0 International Public License](https://github.com/Son1kXDev/EnderpearlBackport/tree/main?tab=License-1-ov-file)
