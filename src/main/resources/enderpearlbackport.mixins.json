@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.enjine.enderpearlbackport.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EnderPearlEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

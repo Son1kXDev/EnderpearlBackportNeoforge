@@ -18,6 +18,20 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+def versionSourceDir = "src/v${target_version}"
+
+sourceSets {
+    main {
+        java {
+            srcDir "${versionSourceDir}/java"
+        }
+        resources {
+            srcDir "${versionSourceDir}/resources"
+        }
+    }
+}
+
+
 neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
