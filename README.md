@@ -1,6 +1,6 @@
 ## Enderpearl Backport
 
-**Enderpearl Backport** brings the modern Ender Pearl mechanics introduced in **Minecraft 1.21.2+** to earlier Fabric versions.
+**Enderpearl Backport** brings the modern Ender Pearl mechanics introduced in **Minecraft 1.21.2+** to earlier Neoforge versions.
 
 The goal of this mod is **full behavioral parity with vanilla 1.21.2+ Ender Pearls**, including chunk loading, cross-dimension teleportation, and persistence — features that do **not exist** in vanilla versions below 1.21.2.
 
@@ -12,7 +12,6 @@ The mod is built with a **clean version-bridge architecture**:
 - Supporting a new Minecraft version usually requires **only adding a new version folder**, not rewriting the mod.
 
 Currently supported:
-- **Minecraft 1.20.x**
 - **Minecraft 1.21.x (up to 1.21.1)**
 
 ---
@@ -30,7 +29,7 @@ Currently supported:
 
 - **Mod Loader:** NeoForge
 - **Java:** 21+
-- **Minecraft:** 1.20.x – 1.21.1
+- **Minecraft:** 1.21 – 1.21.1
 
 ---
 
@@ -41,7 +40,6 @@ The project is structured to make future ports easy:
 ```
 src/
 ├─ main/ # shared, version-independent logic
-├─ v120/ # Minecraft 1.20.x implementations
 └─ v121/ # Minecraft 1.21.x implementations
 ```
 
