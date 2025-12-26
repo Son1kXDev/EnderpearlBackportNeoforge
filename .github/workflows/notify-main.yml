@@ -1,0 +1,17 @@
+name: Notify main repo
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send repository_dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.MAIN_REPO_TOKEN }}
+          repository: Son1kXDev/EnderpearlBackport
+          event-type: submodule-updated
