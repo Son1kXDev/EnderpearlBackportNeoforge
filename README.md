@@ -4,47 +4,6 @@
 
 The goal of this mod is **full behavioral parity with vanilla 1.21.2+ Ender Pearls**, including chunk loading, cross-dimension teleportation, and persistence — features that do **not exist** in vanilla versions below 1.21.2.
 
----
-
-## Features
-
-### Cross-Dimensional Teleportation
-Ender Pearls can teleport players **across dimensions**, including cases where:
-- the pearl enters a portal,
-- the pearl lands in a different dimension than the player.
-
-This behavior is **vanilla-accurate** to Minecraft 1.21.2+.
-
----
-
-### Forced Chunk Loading
-While an Ender Pearl is in flight:
-- the chunk it occupies is **force-loaded**,
-- multiple pearls in the same chunk are **reference-counted**,
-- chunks unload **only when the last pearl leaves**.
-
-This prevents pearls from freezing, despawning, or losing momentum.
-
----
-
-### Persistent Pearls (Logout & Rejoin)
-If a player logs out while their Ender Pearl is in flight:
-- the pearl is **removed from the world**,
-- its exact state (position, velocity, dimension) is saved,
-- upon rejoining, the pearl is **fully restored** and continues flying naturally.
-
----
-
-### World-Safe Persistence
-Active Ender Pearls are stored using Minecraft’s native  
-`PersistentState` system (per-world data), ensuring:
-
-- safe recovery after server restarts,
-- automatic cleanup after restoration,
-- no external JSON config files.
-
----
-
 ### Version-Aware Architecture
 The mod is built with a **clean version-bridge architecture**:
 
@@ -66,23 +25,10 @@ Currently supported:
 - All persistence uses vanilla world data (`PersistentState`).
 - No gameplay logic is duplicated between versions.
 
----
-
-## Why This Mod Exists
-
-In vanilla Minecraft versions **below 1.21.2**, Ender Pearls:
-
-- cannot teleport across dimensions  
-- do not keep chunks loaded  
-- cannot be safely restored  
-
-This mod **backports the exact modern behavior**, without hacks or approximations.
-
----
 
 ## Loader & Requirements
 
-- **Mod Loader:** Fabric
+- **Mod Loader:** NeoForge
 - **Java:** 21+
 - **Minecraft:** 1.20.x – 1.21.1
 
